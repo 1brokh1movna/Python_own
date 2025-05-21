@@ -1,1 +1,77 @@
-abc
+from aiogram import Bot, Dispatcher, types
+from aiogram.filters import Command
+from aiogram import F
+from aiogram.types import BotCommand
+import asyncio
+
+API_TOKEN = '8041918129:AAGqTax8-wAVq8Kt6pbLsaQWlcQgnFg_kWY'
+
+bot = Bot(token=API_TOKEN)
+dp = Dispatcher()
+
+async def set_commands(bot: Bot):
+    commands = [
+        BotCommand(command="/start", description="Запустить бота"),
+        BotCommand(command="/help", description="Помощь"),
+        BotCommand(command="/photo", description="Фото"),
+    ]
+    await bot.set_my_commands(commands)
+
+images = [
+    "https://avatars.mds.yandex.net/i?id=8a096a75620324ec6cba2f3cdbfb38acc2bb75f1-5843150-images-thumbs&n=13",
+    "https://i.pinimg.com/originals/1f/6a/82/1f6a82f99b2b0a739c1bbe77f44e7597.jpg",
+    "https://wonderfulengineering.com/wp-content/uploads/2014/10/image-wallpaper-46.jpg"
+]
+
+image = "https://wonderfulengineering.com/wp-content/uploads/2014/10/image-wallpaper-46.jpg"
+
+@dp.message(Command("start"))
+async def send_start(message: types.Message):
+    await message.answer("Salom, bu mening birinchi botim!")
+
+@dp.message(Command("help"))
+async def help_handler(message: types.Message):
+    await message.reply("Sizga qanday yordam bera olaman!")
+
+@dp.message(Command("photo"))
+async def photo_handler(message: types.Message):
+    for img_url in images:
+        await message.answer_photo(photo=img_url)
+
+@dp.message(F.photo)
+async def menu_handler(message: types.Message):
+        await message.reply("Siz rasim yubordingiz!")
+
+@dp.message(F.video)
+async def menu_handler(message: types.Message):
+        await message.reply("Siz video yubordingiz!")
+
+@dp.message(F.document)
+async def menu_handler(message: types.Message):
+        await message.reply("Siz document yubordingiz!")
+
+@dp.message(F.location)
+async def menu_handler(message: types.Message):
+        await message.reply("Siz location yubordingiz!")
+
+@dp.message(F.text == "photo")
+async def menu_handler(message: types.Message):
+    await message.answer_photo(photo=image)
+
+@dp.message(F.forward_date)
+async def menu_handler(message: types.Message):
+        await message.reply("Boshqa foydalanuvchining habarini yubordingiz!")
+
+@dp.message(F.text.contains("ahmoq"))
+async def handle_insult(message: types.Message):
+    if "ahmoq" in message.text.lower():
+        await message.reply("Iltmos odobli bo'ling!")
+
+
+
+async def main():
+    await set_commands(bot)  # << bu juda muhim qator
+    await dp.start_polling(bot)
+
+if __name__ == '__main__':
+    asyncio.run(main())
